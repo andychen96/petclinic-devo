@@ -10,14 +10,14 @@ variables:
 build_job:
   stage: build
   script:
-    - apt-get update && apt-get install -y maven
+    - dnf update && dnf install -y maven
     - mvn clean compile
     # Add additional build commands if necessary
 
 test_job:
   stage: test
   script:
-    - apt-get update && apt-get install -y maven
+    - dnf update && dnf install -y maven
     - mvn test
     # Add additional test commands if necessary
 

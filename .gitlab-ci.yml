@@ -1,30 +1,14 @@
-stages:
-  - build
-  - test
-  - deploy
+image: maven:3.8.1-jdk-8
 
 variables:
-  # Define your environment-specific variables here
-  ENVIRONMENT: production
+  MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
 
-build_job:
+cache:
+  paths:
+    - .m2/repository
+
+build:
   stage: build
   script:
-    - dnf update && dnf install -y maven
-    - mvn clean compile
-    # Add additional build commands if necessary
+    - mvn clean install
 
-test_job:
-  stage: test
-  script:
-    - dnf update && dnf install -y maven
-    - mvn test
-    # Add additional test commands if necessary
-
-deploy_job:
-  stage: deploy
-  script:
-    - dnf update -y
-    - dnf install -y maven
-    - mvn deploy
-    # Add additional deployment commands if necessary

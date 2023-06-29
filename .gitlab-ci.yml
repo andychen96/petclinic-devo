@@ -1,0 +1,29 @@
+stages:
+  - build
+  - test
+  - deploy
+
+variables:
+  # Define your environment-specific variables here
+  ENVIRONMENT: production
+
+build_job:
+  stage: build
+  script:
+    - apt-get update && apt-get install -y maven
+    - mvn clean compile
+    # Add additional build commands if necessary
+
+test_job:
+  stage: test
+  script:
+    - apt-get update && apt-get install -y maven
+    - mvn test
+    # Add additional test commands if necessary
+
+deploy_job:
+  stage: deploy
+  script:
+    - apt-get update && apt-get install -y maven
+    - mvn deploy
+    # Add additional deployment commands if necessary

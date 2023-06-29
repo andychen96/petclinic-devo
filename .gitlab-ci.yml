@@ -24,6 +24,7 @@ test_job:
 deploy_job:
   stage: deploy
   script:
-    - apt-get update && apt-get install -y maven
+    - dnf update -y
+    - dnf install -y maven
     - mvn deploy
     # Add additional deployment commands if necessary

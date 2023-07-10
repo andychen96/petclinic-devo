@@ -17,7 +17,7 @@ before_script:
 build:
   stage: build
   script:
-    - mvn clean compile
+    - mvn clean package
 
 test:
   stage: test

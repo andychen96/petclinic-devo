@@ -6,6 +6,10 @@ stages:
 
 variables:
   MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
+  TOMCAT_HOST: "localhost"
+  TOMCAT_PORT: "http://localhost:8080"
+  TOMCAT_USERNAME: "admin1"
+  TOMCAT_PASSWORD: "admin1"
 
 before_script:
   - dnf install -y maven
@@ -27,5 +31,5 @@ package:
 
 Deploy_job:
   stage: deploy
-  script: mvn deploy
-
+  script: 
+    - curl --upload-file target/*.war "http://$admin1:$admin1$localhost$http://localhost:8080/manager/text/deploy?path=/petclinic&update=true"

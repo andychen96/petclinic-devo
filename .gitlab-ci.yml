@@ -1,37 +1,59 @@
-image: maven:3-jdk-11
+# Utilize the docker container image tagged as "maven:latest"
+# see - https://hub.docker.com/_/maven
+# What is a container - https://www.docker.com/resources/what-container
+image: maven:latest
 
+# We now specify the differnt stages of our CI build. We have 3 stages
 stages:
   - build
   - test
-  - deploy
+  - package
 
+# Here we specify variables which may be used later
+# These variables will be available via the CLI as $VARIABLE_NAME
 variables:
-  MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
-  TOMCAT_HOST: "83.83.42.214"
-  TOMCAT_PORT: "http://localhost:8080/"
-  TOMCAT_USERNAME: "admin1"
-  TOMCAT_PASSWORD: "admin1"
+  MAVEN_CLI_OPTS: " --batch-mode"
+  MAVEN_OPTS: "-Dmaven.repo.local=./../.m2/repository"
 
-before_script:
-  - dnf update -y
-  - dnf install -y maven
+# Here we are indicating which paths on the filesystem we would like to cache
+# i.e. keep for later. This gives us the option to have faster builds.
+# In this specific instance we are caching the maven repo directory which means
+# maven will not have download packages from the internet next time it runs
+cache:
+  paths:
+    - .m2/repository/
 
+# Here we are specify a task that will run at our build stage
 build:
+# we specify the stage at which this will run
   stage: build
-  script: "mvn install -B"
+# Here we choose to specify the list of CLI commands to run to accomplish the task
   script:
-    - mvn clean package
+# We need to build and "install" the library project first since our other project depends on it
+# let us navigate to the directory with our library project
+    - cd welcome-lib 
+    - mvn $MAVEN_CLI_OPTS compile # let us compile
+    - mvn $MAVEN_CLI_OPTS install # let us install it in our local maven repository
+    - cd .. # let us go back up on directory
+    - cd welcome-service # let us go into our app directory
+    - mvn $MAVEN_CLI_OPTS compile # let us compile our app and it should find the previously installed lib project
 
 test:
-  stage: test
+  stage: test # this task will run at the test stage
   script:
-    - mvn test
+# again this task starts from the base directory
+    - cd welcome-service # navigate to the app directory
+    - mvn $MAVEN_CLI_OPTS test # run any tests specified in this application
 
-deploy:
-  stage: deploy
+package:
+  stage: package # this task will run at our package stage
   script:
-    - mvn package
-    - cp /home/andychen/devoteam-traineeship-petclinic/target/petclinic.war /opt/apache-tomcat-9.0.76/webapps
-     - echo "Deploying to production server"
-    - curl --upload-file /home/andychen/devoteam-traineeship-petclinic/target/petclinic.war  "http://$admin1:$admin1@$83.83.42.214:$TOMCAT_PORT/manager/text/deploy?/home/andychen/devoteam-traineeship-petclinic/target/petclinic.war&update=true"
-
+# again this task starts from the base directory
+    - cd welcome-service # navigate to the app directory
+# let us run this command to convert the app into a runnable jar, this is possible because of settings in our pom.xml
+    - mvn $MAVEN_CLI_OPTS package 
+# let us indicate that we would like to save the result of this stage as an artefact
+  artifacts:
+    paths: # we must specify the location of all artefacts line by line
+    - welcome-service/target/welcome-service-0.0.1-SNAPSHOT-jar-with-dependencies.jar
+    expire_in: 1 week # this artefact will be saved on gitlab for one week

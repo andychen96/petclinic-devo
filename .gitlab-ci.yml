@@ -32,6 +32,4 @@ package:
 deploy:
   stage: deploy
   script:
-    - mkdir deploy
-    - cp target/*.war deploy/petclinic.war
-    - curl --upload-file deploy/petclinic.war "http://$TOMCAT_USERNAME:$TOMCAT_PASSWORD@$TOMCAT_HOST:$TOMCAT_PORT/manager/text/deploy?path=/petclinic&update=true"
+    - mvn tomcat7:deploy

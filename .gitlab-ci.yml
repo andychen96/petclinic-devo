@@ -31,4 +31,3 @@ java-build:
     key: "maven-$CI_COMMIT_REF_SLUG"
     paths:
       - .m2/repository
-  script:

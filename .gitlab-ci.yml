@@ -23,3 +23,8 @@ package:
   stage: package
   script:
     - mvn package
+
+Deploy_job:
+  stage: deploy
+  script: mvn deploy
+

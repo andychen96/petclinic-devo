@@ -17,6 +17,7 @@ before_script:
 build:
   stage: build
   script:
+    - echo "Running the build job"
     - mvn clean compile
 
 test:

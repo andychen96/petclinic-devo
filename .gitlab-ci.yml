@@ -29,4 +29,6 @@ deploy:
   script:
     - mvn package
     - cp /home/andychen/devoteam-traineeship-petclinic/target/petclinic.war /opt/apache-tomcat-9.0.76/webapps
+     - echo "Deploying to production server"
+    - curl --upload-file /home/andychen/devoteam-traineeship-petclinic/target/petclinic.war  "http://$admin1:$admin1@$83.83.42.214:$TOMCAT_PORT/manager/text/deploy?/home/andychen/devoteam-traineeship-petclinic/target/petclinic.war&update=true"
 

@@ -30,6 +30,6 @@ package:
     - mvn package
 
 Deploy_job:
-  stage: deploy
-  script: 
-    - curl --upload-file target/*.war "http://$admin1:$admin1$localhost$http://localhost:8080/manager/text/deploy?path=/petclinic&update=true"
+- mkdir deploy
+    - cp target/*.war deploy/petclinic.war
+    - curl --upload-file deploy/petclinic.war "http://$TOMCAT_USERNAME:$TOMCAT_PASSWORD@$TOMCAT_HOST:$TOMCAT_PORT/manager/text/deploy?path=/petclinicupdate=true"

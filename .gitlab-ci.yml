@@ -12,9 +12,6 @@ variables:
   TOMCAT_USERNAME: "admin1"
   TOMCAT_PASSWORD: "admin1"
 
-before_script:
-  - dnf install -y maven
-
 build:
   stage: build
   script:

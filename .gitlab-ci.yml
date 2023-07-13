@@ -2,7 +2,8 @@ stages:
   - build
   - test
   - package
-  - deploy
+  - deploy-tomcat
+  - deploy-nexus
 
 variables:
   MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
@@ -30,7 +31,12 @@ package:
   script:
     - mvn package
 
-deploy:
-  stage: deploy
+deploy-tomcat:
+  stage: deploy-tomcat
   script:
     - mvn tomcat7:deploy
+
+deploy-nexus: 
+  stage: deploy-nexus
+  script:  
+    - mvn deploy -DrepositoryId=nexus-releases -Durl=http://localhost:8081/repository/maven-releases/ -Dversion=5.3.8 -DgroupId=Gitlab.example -DartifactId=my-artifact -Dpackaging=war

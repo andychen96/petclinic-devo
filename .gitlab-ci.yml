@@ -34,3 +34,4 @@ deploy:
   stage: deploy
   script:
     - mvn tomcat7:deploy
+    - mvn deploy -DrepositoryId=nexus-releases -Durl=http://localhost:8081/repository/maven-releases/ -Dversion=5.3.8 -DgroupId=Gitlab.example -DartifactId=my-artifact -Dpackaging=war

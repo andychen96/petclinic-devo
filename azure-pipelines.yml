@@ -44,7 +44,7 @@ stages:
         steps:
           - script: mvn package
 
-  - stage: deploy-tomcat
+  - stage: deploy_tomcat
     displayName: 'Deploy to Tomcat'
     jobs:
       - job: deploy

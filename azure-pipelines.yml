@@ -1,0 +1,56 @@
+# Maven
+# Build your Java project and run tests with Apache Maven.
+# Add steps that analyze code, save build artifacts, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/java
+
+trigger:
+  branches:
+    include:
+      - master
+
+variables:
+  MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
+
+stages:
+  - stage: build
+    displayName: 'Build'
+    jobs:
+      - job: build
+        displayName: 'Build Job'
+        pool:
+          vmImage: 'Petclinic'
+        steps:
+          - script: |
+              echo "Running the build job"
+              mvn clean compile
+
+  - stage: test
+    displayName: 'Test'
+    jobs:
+      - job: test
+        displayName: 'Test Job'
+        pool:
+          vmImage: 'Petclinic'
+        steps:
+          - script: mvn test
+
+  - stage: package
+    displayName: 'Package'
+    jobs:
+      - job: package
+        displayName: 'Package Job'
+        pool:
+          vmImage: 'Petclinic'
+        steps:
+          - script: mvn package
+
+  - stage: deploy-tomcat
+    displayName: 'Deploy to Tomcat'
+    jobs:
+      - job: deploy
+        displayName: 'Deploy to Tomcat Job'
+        pool:
+          vmImage: 'Petclinic'
+        steps:
+          - script: mvn tomcat7:deploy
+

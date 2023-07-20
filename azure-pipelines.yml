@@ -17,8 +17,7 @@ stages:
     jobs:
       - job: build
         displayName: 'Build Job'
-        pool:
-          vmImage: 'Petclinic'
+        pool: Petclinic
         steps:
           - script: |
               echo "Running the build job"
@@ -29,8 +28,7 @@ stages:
     jobs:
       - job: test
         displayName: 'Test Job'
-        pool:
-          vmImage: 'Petclinic'
+        pool: Petclinic
         steps:
           - script: mvn test
 
@@ -39,8 +37,7 @@ stages:
     jobs:
       - job: package
         displayName: 'Package Job'
-        pool:
-          vmImage: 'Petclinic'
+        pool: Petclinic
         steps:
           - script: mvn package
 
@@ -49,8 +46,7 @@ stages:
     jobs:
       - job: deploy
         displayName: 'Deploy to Tomcat Job'
-        pool:
-          vmImage: 'Petclinic'
+        pool: Petclinic
         steps:
           - script: mvn tomcat7:deploy
 

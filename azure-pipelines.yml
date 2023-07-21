@@ -12,16 +12,15 @@ variables:
   MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
 
 stages:
-  - stage: build
-    displayName: 'Build'
-    jobs:
-      - job: build
-        displayName: 'Build Job'
-        pool: Petclinic
-        steps:
-          - script: |
-              echo "Running the build job"
-              mvn clean compile
+#  - stage: build
+#    displayName: 'Build'
+#    jobs:
+#      - job: build
+#        displayName: 'Build Job'
+#        pool: Petclinic
+#        steps:
+#          - script: |
+#              mvn clean compile
 
   - stage: test
     displayName: 'Test'

@@ -7,43 +7,6 @@ variables:
   MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
 
 stages:
-  - stage: build
-    displayName: 'Build'
-    jobs:
-      - job: build
-        displayName: 'Build Job'
-        pool: Petclinic
-        steps:
-          - script: |
-              mvn clean compile
-
-  - stage: test
-    displayName: 'Test'
-    jobs:
-      - job: test
-        displayName: 'Test Job'
-        pool: Petclinic
-        steps:
-          - script: mvn test
-
-  - stage: package
-    displayName: 'Package'
-    jobs:
-      - job: package
-        displayName: 'Package Job'
-        pool: Petclinic
-        steps:
-          - script: mvn package
-
-  - stage: deploy_tomcat
-    displayName: 'Deploy to Tomcat'
-    jobs:
-      - job: deploy
-        displayName: 'Deploy to Tomcat Job'
-        pool: Petclinic
-        steps:
-          - script: mvn tomcat7:deploy
-
   - stage: load_test
     displayName: 'Load Test'
     jobs:
@@ -52,19 +15,14 @@ stages:
         pool: Petclinic
         steps:
           - script: |
-              # Remove the existing 'load-test.jmx' file if it exists
-              rm -f $(Pipeline.Workspace)/load-test.jmx
+              # Remove the existing 'load-test-repo' directory if it exists
+              rm -rf $(Pipeline.Workspace)/load-test-repo
 
-              # Clone or download the JMeter test plan into the workspace
-              # For example, using git clone or wget/curl if the test plan is publicly accessible
+              # Clone the JMeter test plan repository into the workspace
               git clone https://github.com/andychen96/petclinic-devo.git $(Pipeline.Workspace)/load-test-repo
-              cp $(Pipeline.Workspace)/load-test-repo/load-test.jmx $(Pipeline.Workspace)/load-test.jmx
 
-              # Install JMeter on a Linux-based Fedora agent
-              dnf install -y jmeter
-
-              # Run the JMeter load test
-              jmeter -n -t $(Pipeline.Workspace)/load-test.jmx -l $(Pipeline.Workspace)/results.jtl
+              # Run the JMeter load test using the locally installed JMeter
+              jmeter -n -t $(Pipeline.Workspace)/load-test-repo/load-test.jmx -l $(Pipeline.Workspace)/results.jtl
             displayName: 'Run JMeter Tests'
 
           - task: PublishTestResults@2
@@ -73,4 +31,5 @@ stages:
               testResultsFormat: 'JUnit'
               testResultsFiles: '$(Pipeline.Workspace)/results.jtl'
               failTaskOnFailedTests: true
+
 

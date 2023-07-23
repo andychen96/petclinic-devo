@@ -7,6 +7,43 @@ variables:
   MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
 
 stages:
+  - stage: build
+    displayName: 'Build'
+    jobs:
+      - job: build
+        displayName: 'Build Job'
+        pool: Petclinic
+        steps:
+          - script: |
+              mvn clean compile
+
+  - stage: test
+    displayName: 'Test'
+    jobs:
+      - job: test
+        displayName: 'Test Job'
+        pool: Petclinic
+        steps:
+          - script: mvn test
+
+  - stage: package
+    displayName: 'Package'
+    jobs:
+      - job: package
+        displayName: 'Package Job'
+        pool: Petclinic
+        steps:
+          - script: mvn package
+
+  - stage: deploy_tomcat
+    displayName: 'Deploy to Tomcat'
+    jobs:
+      - job: deploy
+        displayName: 'Deploy to Tomcat Job'
+        pool: Petclinic
+        steps:
+          - script: mvn tomcat7:deploy
+
   - stage: load_test
     displayName: 'Load Test'
     jobs:
@@ -14,16 +51,20 @@ stages:
         displayName: 'JMeter Load Test Job'
         pool: Petclinic
         steps:
-          - script: |
-              # Remove the existing 'load-test-repo' directory if it exists
-              rm -rf $(Pipeline.Workspace)/load-test-repo
+          # You can add any necessary steps before running the JMeter load test
 
-              # Clone the JMeter test plan repository into the workspace
-              git clone https://github.com/andychen96/petclinic-devo.git $(Pipeline.Workspace)/load-test-repo
+          - task: CmdLine@2
+            displayName: 'Run JMeter Locally'
+            inputs:
+              script: |
+                # Remove the existing 'load-test-repo' directory if it exists
+                rm -rf $(Pipeline.Workspace)/load-test-repo
 
-              # Run the JMeter load test using the locally installed JMeter
-              jmeter -n -t $(Pipeline.Workspace)/load-test-repo/load-test.jmx -l $(Pipeline.Workspace)/results.jtl
-            displayName: 'Run JMeter Tests'
+                # Clone the JMeter test plan repository into the workspace
+                git clone https://github.com/andychen96/petclinic-devo.git $(Pipeline.Workspace)/load-test-repo
+
+                # Run the JMeter load test using the locally installed JMeter
+                jmeter -n -t $(Pipeline.Workspace)/load-test-repo/load-test.jmx -l $(Pipeline.Workspace)/results.jtl
 
           - task: PublishTestResults@2
             displayName: 'Publish JMeter Test Results'
@@ -31,5 +72,13 @@ stages:
               testResultsFormat: 'JUnit'
               testResultsFiles: '$(Pipeline.Workspace)/results.jtl'
               failTaskOnFailedTests: true
+
+schedules:
+- cron: "0 0 * * *"   # This cron expression represents daily at midnight (00:00)
+  displayName: DailySchedule
+  branches:
+    include:
+      - master
+
 
 

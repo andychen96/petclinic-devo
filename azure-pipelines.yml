@@ -51,17 +51,13 @@ stages:
         displayName: 'JMeter Load Test Job'
         pool: Petclinic
         steps:
-          - task: DownloadBuildArtifacts@0
-            displayName: 'Download Artifacts'
-            inputs:
-              buildType: 'specific'
-              project: 'petclinic-devo'
-              pipeline: <azure-pipelines.yml>
-              buildVersionToDownload: 'latest'
-              artifactName: 'jmeter-artifact'
-              downloadPath: '$(Pipeline.Workspace)'
+          - script: |
+              # Clone or download the JMeter test plan into the workspace
+              # For example, using git clone or wget/curl if the test plan is publicly accessible
+              git clone https://github.com/andychen96/petclinic-devo/blob/main/load-test.jmx
 
-          - script: 'jmeter -n -t $(Pipeline.Workspace)/home/andychen/Documents/Jmeter/apache-jmeter-5.6.2/bin/load_test.jmx -l $(Pipeline.Workspace)/results.jtl'
+              # Run the JMeter load test
+              jmeter -n -t $(Pipeline.Workspace)/load_test.jmx -l $(Pipeline.Workspace)/results.jtl
             displayName: 'Run JMeter Tests'
 
           - task: PublishTestResults@2

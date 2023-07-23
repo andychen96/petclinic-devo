@@ -57,11 +57,11 @@ stages:
 
               # Clone or download the JMeter test plan into the workspace
               # For example, using git clone or wget/curl if the test plan is publicly accessible
-              git clone https://github.com/andychen96/petclinic-devo/blob/main/load-test.jmx $(Pipeline.Workspace)/load-test.jmx
+              git clone https://github.com/andychen96/petclinic-devo.git $(Pipeline.Workspace)/load-test-repo
+              cp $(Pipeline.Workspace)/load-test-repo/load-test.jmx $(Pipeline.Workspace)/load-test.jmx
 
-              # Ensure JMeter is installed or set up Java and JMeter correctly on the agent
-              # For example, using 'UseJavaVersion' task to set up Java
-              # And ensuring that JMeter is in the PATH environment variable
+              # Install JMeter on a Linux-based Fedora agent
+              sudo dnf install -y jmeter
 
               # Run the JMeter load test
               jmeter -n -t $(Pipeline.Workspace)/load-test.jmx -l $(Pipeline.Workspace)/results.jtl

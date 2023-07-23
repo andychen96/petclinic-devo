@@ -52,12 +52,19 @@ stages:
         pool: Petclinic
         steps:
           - script: |
+              # Remove the existing 'load-test.jmx' file if it exists
+              rm -f $(Pipeline.Workspace)/load-test.jmx
+
               # Clone or download the JMeter test plan into the workspace
               # For example, using git clone or wget/curl if the test plan is publicly accessible
-              git clone https://github.com/andychen96/petclinic-devo/blob/main/load-test.jmx
+              git clone https://github.com/andychen96/petclinic-devo/blob/main/load-test.jmx $(Pipeline.Workspace)/load-test.jmx
+
+              # Ensure JMeter is installed or set up Java and JMeter correctly on the agent
+              # For example, using 'UseJavaVersion' task to set up Java
+              # And ensuring that JMeter is in the PATH environment variable
 
               # Run the JMeter load test
-              jmeter -n -t $(Pipeline.Workspace)/load_test.jmx -l $(Pipeline.Workspace)/results.jtl
+              jmeter -n -t $(Pipeline.Workspace)/load-test.jmx -l $(Pipeline.Workspace)/results.jtl
             displayName: 'Run JMeter Tests'
 
           - task: PublishTestResults@2

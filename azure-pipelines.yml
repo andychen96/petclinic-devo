@@ -57,7 +57,6 @@ stages:
             displayName: 'Run JMeter Locally'
             inputs:
               script: |
-                whoami
                 # Remove the existing 'load-test-repo' directory if it exists
                 rm -rf $(Pipeline.Workspace)/load-test-repo
 
@@ -65,7 +64,7 @@ stages:
                 git clone https://github.com/andychen96/petclinic-devo.git $(Pipeline.Workspace)/load-test-repo
 
                 # Run the JMeter load test using the locally installed JMeter
-                /home/andychen/Documents/Jmeter/apache-jmeter-5.6.2/bin/jmeter -n -t $(Pipeline.Workspace)/load-test-repo/load-test.jmx -l $(Pipeline.Workspace)/results.jtl
+                jmeter -n -t $(Pipeline.Workspace)/load-test-repo/load-test.jmx -l $(Pipeline.Workspace)/results.jtl
 
           - task: PublishTestResults@2
             displayName: 'Publish JMeter Test Results'

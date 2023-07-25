@@ -57,6 +57,7 @@ stages:
             displayName: 'Run JMeter Locally'
             inputs:
               script: |
+                source ~/.bashrc
                 # Remove the existing 'load-test-repo' directory if it exists
                 rm -rf $(Pipeline.Workspace)/load-test-repo
 

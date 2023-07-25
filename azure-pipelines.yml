@@ -65,7 +65,7 @@ stages:
                 git clone https://github.com/andychen96/petclinic-devo.git $(Pipeline.Workspace)/load-test-repo
 
                 # Run the JMeter load test using the locally installed JMeter
-                jmeter -n -t $(Pipeline.Workspace)/load-test-repo/load-test.jmx -l $(Pipeline.Workspace)/results.jtl
+                jmeter -Jmeter.save.saveservice.output_format=csv -n -t $(Pipeline.Workspace)/load-test-repo/load-test.jmx -l $(Pipeline.Workspace)/results.jtl 
 
           - task: PublishTestResults@2
             displayName: 'Publish JMeter Test Results'

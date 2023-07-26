@@ -65,7 +65,7 @@ stages:
                 git clone https://github.com/andychen96/petclinic-devo.git $(Pipeline.Workspace)/load-test-repo
 
                 # Run the JMeter load test using the locally installed JMeter
-                jmeter -Jmeter.save.saveservice.output_format=csv -n -t $(Pipeline.Workspace)/load-test-repo/load-test.jmx -l $(Pipeline.Workspace)/results.jtl 
+                jmeter -Jmeter.save.saveservice.output_format=csv -n -t $(Pipeline.Workspace)/load-test-repo/load-test.jmx -l $(Pipeline.Workspace)/results.jtl
 
           - task: PublishTestResults@2
             displayName: 'Publish JMeter Test Results'
@@ -74,12 +74,19 @@ stages:
               testResultsFiles: '$(Pipeline.Workspace)/results.jtl'
               failTaskOnFailedTests: true
 
+
+          - job: run_selenium_test
+            displayName: 'Run Selenium Test'
+            pool: Petclinic 
+            steps:
+    - script: |
+        python /home/andychen/Documents/devoteam-traineeship-petclinic/selenium-test.py
+      displayName: 'Run Selenium Test'
+
+
 schedules:
 - cron: "0 0 * * *"   # This cron expression represents daily at midnight (00:00)
   displayName: DailySchedule
   branches:
     include:
       - master
-
-
-

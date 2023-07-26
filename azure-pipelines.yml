@@ -80,7 +80,7 @@ stages:
             pool: Petclinic 
             steps:
     - script: |
-        python /home/andychen/Documents/devoteam-traineeship-petclinic/selenium-test.py
+        python /home/andychen/Documents/devoteam-traineeship-petclinic/selenium
       displayName: 'Run Selenium Test'
 
 

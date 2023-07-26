@@ -75,13 +75,17 @@ stages:
               failTaskOnFailedTests: true
 
 
-          - job: run_selenium_test
+
+  - stage: run_selenium_test
+    displayName: 'Run Selenium Test'
+    jobs:
+      - job: run_selenium_test
+        displayName: 'Run Selenium Test Job'
+        pool: Petclinic 
+        steps:
+          - script: |
+              python /home/andychen/Documents/devoteam-traineeship-petclinic/selenium/selenium_test.py
             displayName: 'Run Selenium Test'
-            pool: Petclinic 
-            steps:
-    - script: |
-        python /home/andychen/Documents/devoteam-traineeship-petclinic/selenium
-      displayName: 'Run Selenium Test'
 
 
 schedules:

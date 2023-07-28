@@ -57,7 +57,7 @@ stages:
             inputs:
               script: |
                 # Run the JMeter load test using the locally installed JMeter
-                jmeter -Jmeter.save.saveservice.output_format=csv -n -t $(Pipeline.Workspace)/load-test-repo/load-test.jmx -l $(Pipeline.Workspace)/results.jtl
+                jmeter -Jmeter.save.saveservice.output_format=xml -n -t $(Pipeline.Workspace)/load-test-repo/load-test.jmx -l $(Pipeline.Workspace)/results.jtl
 
           - task: PublishTestResults@2
             displayName: 'Publish JMeter Test Results'

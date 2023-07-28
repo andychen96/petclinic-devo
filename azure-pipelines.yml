@@ -51,7 +51,6 @@ stages:
         displayName: 'JMeter Load Test Job'
         pool: Petclinic
         steps:
-          # You can add any necessary steps before running the JMeter load test
 
           - task: CmdLine@2
             displayName: 'Run JMeter Locally'

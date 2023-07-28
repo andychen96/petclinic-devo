@@ -57,11 +57,6 @@ stages:
             inputs:
               script: |
                 source ~/.bashrc
-                # Remove the existing 'load-test-repo' directory if it exists
-                rm -rf $(Pipeline.Workspace)/load-test-repo
-
-                # Clone the JMeter test plan repository into the workspace
-                git clone https://github.com/andychen96/petclinic-devo.git $(Pipeline.Workspace)/load-test-repo
 
                 # Run the JMeter load test using the locally installed JMeter
                 jmeter -Jmeter.save.saveservice.output_format=csv -n -t $(Pipeline.Workspace)/load-test-repo/load-test.jmx -l $(Pipeline.Workspace)/results.jtl
@@ -72,6 +67,8 @@ stages:
               testResultsFormat: 'JUnit'
               testResultsFiles: '$(Pipeline.Workspace)/results.jtl'
               failTaskOnFailedTests: true
+              
+              
 
 
 

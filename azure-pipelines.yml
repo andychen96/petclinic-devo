@@ -57,7 +57,7 @@ stages:
             inputs:
               script: |
                 # Run the JMeter load test using the locally installed JMeter
-                jmeter -Jmeter.save.saveservice.output_format=xml -n -t $(Pipeline.Workspace)/load-test-repo/load-test.jmx -l $(Pipeline.Workspace)/results.jtl | tee $(Pipeline.Workspace)/jmeter_console_output.log
+                jmeter -Jmeter.save.saveservice.output_format=xml -n -t $(Pipeline.Workspace)/load-test-repo/load-test.jmx -l $(Pipeline.Workspace)/results.jtl -e -o $(Pipeline.Workspace)/jmeter_report
               
               
               

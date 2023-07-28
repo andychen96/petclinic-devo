@@ -63,7 +63,7 @@ stages:
             displayName: 'Publish JMeter Test Results'
             inputs:
               testResultsFormat: 'JUnit'
-              testResultsFiles: '$(Pipeline.Workspace)/results.jtl'
+              testResultsFiles: '$(Pipeline.Workspace)/results.xml'
               failTaskOnFailedTests: true
               
               

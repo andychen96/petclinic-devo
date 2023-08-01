@@ -52,8 +52,8 @@ stages:
         pool: Petclinic
         steps:
           - script: |
-              cp -R test $(Pipeline.Workspace)/ansible
-              cp deploy_petclinic.yml $(Pipeline.Workspace)/ansible
+              cp -R ansible_project $(Pipeline.Workspace)
+            #cp ansible_project/deploy_petclinic.yml $(Pipeline.Workspace)/ansible_project
 
 
   - stage: load_test

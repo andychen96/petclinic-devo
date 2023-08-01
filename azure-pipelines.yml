@@ -44,6 +44,18 @@ stages:
         steps:
           - script: mvn tomcat7:deploy
 
+  - stage: prepare_ansible
+    displayName: 'Prepare Environment'
+    jobs:
+      - job: prepare
+        displayName: 'Prepare Environment Job'
+        pool: Petclinic
+        steps:
+          - script: |
+              cp -R test $(Pipeline.Workspace)/ansible
+              cp deploy_petclinic.yml $(Pipeline.Workspace)/ansible
+
+
   - stage: load_test
     displayName: 'Load Test'
     jobs:

@@ -1,0 +1,9 @@
+all:
+  hosts:
+    test:
+      ansible_connection: local
+    acceptance:
+      ansible_connection: local
+    production:
+      ansible_connection: local
+

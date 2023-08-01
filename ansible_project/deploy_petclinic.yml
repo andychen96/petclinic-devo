@@ -1,0 +1,64 @@
+---
+- name: Deploy Petclinic application to test environment
+  hosts: test
+  become: yes
+  tasks:
+    - name: Build the Docker image
+      docker_image:
+        source: build 
+        build:
+          path: ./test
+        name: petclinic_test
+        tag: latest
+        state: present
+
+    - name: Run the container
+      docker_container:
+        name: petclinic_test
+        image: petclinic_test:latest
+        ports:
+          - "8082:8080"
+        state: started
+
+- name: Deploy Petclinic application to acceptance environment
+  hosts: acceptance
+  become: yes
+  tasks:
+    - name: Build the Docker image
+      docker_image:
+        source: build
+        build:
+          path: ./acceptance
+        name: petclinic_acceptance
+        tag: latest
+        state: present
+
+    - name: Run the container
+      docker_container:
+        name: petclinic_acceptance
+        image: petclinic_acceptance:latest
+        ports:
+          - "8083:8080"
+        state: started
+
+- name: Deploy Petclinic application to production environment
+  hosts: production
+  become: yes
+  tasks:
+    - name: Build the Docker image
+      docker_image:
+        source: build
+        build:
+          path: ./production
+        name: petclinic_production
+        tag: latest
+        state: present
+
+    - name: Run the container
+      docker_container:
+        name: petclinic_production
+        image: petclinic_production:latest
+        ports:
+          - "8084:8080"
+        state: started
+

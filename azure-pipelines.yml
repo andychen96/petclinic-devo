@@ -79,7 +79,7 @@ stages:
 
   - stage: deploy_production
     displayName: 'Deploy to Production Environment'
-    dependsOn: run_jmeter_tests
+    dependsOn: load_test
     condition: eq(variables['Agent.JobStatus'], 'Succeeded')
     jobs:
       - job: deploy_to_production

@@ -71,7 +71,24 @@ stages:
                 # Run the JMeter load test using the locally installed JMeter
                 jmeter -Jmeter.save.saveservice.output_format=xml -n -t $(Pipeline.Workspace)/load-test-repo/load-test.jmx -l $(Pipeline.Workspace)/results.jtl -e -o $(Pipeline.Workspace)/jmeter_report
               
+          - task: PublishTestResults@2
+            displayName: 'Publish JMeter Test Results'
+            inputs:
+              testResultsFiles: '$(Pipeline.Workspace)/results.jtl'
+              testRunTitle: 'JMeter Test Results'
 
+  - stage: deploy_production
+    displayName: 'Deploy to Production Environment'
+    dependsOn: run_jmeter_tests
+    condition: eq(variables['Agent.JobStatus'], 'Succeeded')
+    jobs:
+      - job: deploy_to_production
+        displayName: 'Deploy to Production Job'
+        pool: Petclinic
+        steps:
+          - script: |
+              # Run the Ansible playbook
+              ansible-playbook -i $(Pipeline.Workspace)/ansible_project/inventory.yml $(Pipeline.Workspace)/ansible_project/production.yml
 
 
   - stage: run_selenium_test
@@ -83,11 +100,30 @@ stages:
         steps:
           - script: |
               python /home/andychen/devoteam-traineeship-petclinic/selenium-test.py
-            displayName: 'Run Selenium Test'
+              pip install -r requirements.txt  # Install test dependencies
+              pytest --html=report.html
+          - task: PublishTestResults@2
+            displayName: 'Publish Selenium Test Results'
+            inputs:
+              testResultsFiles: 'report.html'
+              testRunTitle: 'Selenium Test Results'
+     
+
+  - stage: deploy_acceptation
+    displayName: 'Deploy to Acceptation Environment'
+    dependsOn: run_selenium_tests
+    condition: eq(variables['Agent.JobStatus'], 'Succeeded')
+    jobs:
+      - job: deploy_to_acceptation
+        displayName: 'Deploy to Acceptation Job'
+        pool: Petclinic
+        steps: 
+         - script: |
+            ansible-playbook -i $(Pipeline.Workspace)/ansible_project/inventory.yml $(Pipeline.Workspace)/ansible_project/acceptance.yml
 
 
 schedules:
-- cron: "0 0 * * *"   # This cron expression represents daily at midnight (00:00)
+- cron: "0 0 * * *"   
   displayName: DailySchedule
   branches:
     include:

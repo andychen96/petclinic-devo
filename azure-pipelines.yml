@@ -26,6 +26,17 @@ stages:
         steps:
           - script: mvn test
 
+  - stage: ansible_deploy_test
+    displayName: 'Ansible Deploy to Test'
+    jobs:
+      - job: ansible_deploy_test
+        displayName: 'Ansible Deploy Test Job'
+        pool: Petclinic
+        steps:
+          - script: |
+              ansible-playbook -i /home/andychen/ansible_project/playbook/test.yml
+  
+
   - stage: package
     displayName: 'Package'
     jobs:
@@ -43,17 +54,6 @@ stages:
         pool: Petclinic
         steps:
           - script: mvn tomcat7:deploy
-
-  - stage: prepare_ansible
-    displayName: 'Prepare Environment'
-    jobs:
-      - job: prepare
-        displayName: 'Prepare Environment Job'
-        pool: Petclinic
-        steps:
-          - script: |
-              cp -R ansible_project $(Pipeline.Workspace)
-              cp ansible_project/deploy_petclinic.yml $(Pipeline.Workspace)/ansible_project
 
 
   - stage: load_test
@@ -77,18 +77,15 @@ stages:
                 # Run the JMeter load test using the locally installed JMeter
                 jmeter -Jmeter.save.saveservice.output_format=xml -n -t $(Pipeline.Workspace)/load-test-repo/load-test.jmx -l $(Pipeline.Workspace)/results.jtl -e -o $(Pipeline.Workspace)/jmeter_report
 
-
-  - stage: deploy_production
-    displayName: 'Deploy to Production Environment'
-    dependsOn: load_test
+  - stage: ansible_deploy_load
+    displayName: 'Ansible Deploy to Load'
     jobs:
-      - job: deploy_to_production
-        displayName: 'Deploy to Production Job'
+      - job: ansible_deploy_load
+        displayName: 'Ansible Deploy Load Job'
         pool: Petclinic
         steps:
           - script: |
-              # Run the Ansible playbook
-              ansible-playbook -i $(Pipeline.Workspace)/ansible_project/inventory.yml $(Pipeline.Workspace)/ansible_project/playbook/production.yml
+              ansible-playbook -i /home/andychen/ansible_project/playbook/production.yml
 
 
   - stage: run_selenium_test
@@ -107,18 +104,17 @@ stages:
             inputs:
               testResultsFiles: 'report.html'
               testRunTitle: 'Selenium Test Results'
-     
 
-  - stage: deploy_acceptation
-    displayName: 'Deploy to Acceptation Environment'
-    dependsOn: run_selenium_test
+  - stage: ansible_deploy_selenium
+    displayName: 'Ansible Deploy to Selenium'
     jobs:
-      - job: deploy_to_acceptation
-        displayName: 'Deploy to Acceptation Job'
+      - job: ansible_deploy_selenium
+        displayName: 'Ansible Deploy Selenium Job'
         pool: Petclinic
-        steps: 
-         - script: |
-            ansible-playbook -i $(Pipeline.Workspace)/ansible_project/inventory.yml $(Pipeline.Workspace)/ansible_project/playbook/acceptation.yml
+        steps:
+          - script: |
+              ansible-playbook -i /home/andychen/ansible_project/playbook/acceptance.yml
+     
 
 
 schedules:

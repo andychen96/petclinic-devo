@@ -81,7 +81,6 @@ stages:
   - stage: deploy_production
     displayName: 'Deploy to Production Environment'
     dependsOn: load_test
-    condition: eq(variables['Agent.JobStatus'], 'Succeeded')
     jobs:
       - job: deploy_to_production
         displayName: 'Deploy to Production Job'

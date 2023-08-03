@@ -70,17 +70,13 @@ stages:
               script: |
                 # Remove old jmeter_report before running
                 rm -rf $(Pipeline.Workspace)/jmeter_report
+                rm -rf $(Pipeline.Workspace)/results.jtl
 
                 displayName: 'Clean Up Old JMeter Reports'
                 
                 # Run the JMeter load test using the locally installed JMeter
                 jmeter -Jmeter.save.saveservice.output_format=xml -n -t $(Pipeline.Workspace)/load-test-repo/load-test.jmx -l $(Pipeline.Workspace)/results.jtl -e -o $(Pipeline.Workspace)/jmeter_report
-              
-          - task: PublishTestResults@2
-            displayName: 'Publish JMeter Test Results'
-            inputs:
-              testResultsFiles: '$(Pipeline.Workspace)/results.jtl'
-              testRunTitle: 'JMeter Test Results'
+
 
   - stage: deploy_production
     displayName: 'Deploy to Production Environment'

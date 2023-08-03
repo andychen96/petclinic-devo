@@ -53,7 +53,7 @@ stages:
         steps:
           - script: |
               cp -R ansible_project $(Pipeline.Workspace)
-            #cp ansible_project/deploy_petclinic.yml $(Pipeline.Workspace)/ansible_project
+              cp ansible_project/deploy_petclinic.yml $(Pipeline.Workspace)/ansible_project
 
 
   - stage: load_test
@@ -88,7 +88,7 @@ stages:
         steps:
           - script: |
               # Run the Ansible playbook
-              ansible-playbook -i $(Pipeline.Workspace)/ansible_project/inventory.yml $(Pipeline.Workspace)/ansible_project/production/production.yml
+              ansible-playbook -i $(Pipeline.Workspace)/ansible_project/inventory.yml $(Pipeline.Workspace)/ansible_project/production/Dockerfile
 
 
   - stage: run_selenium_test
@@ -118,7 +118,7 @@ stages:
         pool: Petclinic
         steps: 
          - script: |
-            ansible-playbook -i $(Pipeline.Workspace)/ansible_project/inventory.yml $(Pipeline.Workspace)/ansible_project/acceptance/acceptance.yml
+            ansible-playbook -i $(Pipeline.Workspace)/ansible_project/inventory.yml $(Pipeline.Workspace)/ansible_project/acceptance/Dockerfile
 
 
 schedules:

@@ -88,7 +88,7 @@ stages:
         steps:
           - script: |
               # Run the Ansible playbook
-              ansible-playbook -i $(Pipeline.Workspace)/ansible_project/inventory.yml $(Pipeline.Workspace)/ansible_project/production.yml
+              ansible-playbook -i $(Pipeline.Workspace)/ansible_project/inventory.yml $(Pipeline.Workspace)/ansible_project/production
 
 
   - stage: run_selenium_test
@@ -112,14 +112,13 @@ stages:
   - stage: deploy_acceptation
     displayName: 'Deploy to Acceptation Environment'
     dependsOn: run_selenium_test
-    condition: eq(variables['Agent.JobStatus'], 'Succeeded')
     jobs:
       - job: deploy_to_acceptation
         displayName: 'Deploy to Acceptation Job'
         pool: Petclinic
         steps: 
          - script: |
-            ansible-playbook -i $(Pipeline.Workspace)/ansible_project/inventory.yml $(Pipeline.Workspace)/ansible_project/acceptance.yml
+            ansible-playbook -i $(Pipeline.Workspace)/ansible_project/inventory.yml $(Pipeline.Workspace)/ansible_project/acceptance
 
 
 schedules:

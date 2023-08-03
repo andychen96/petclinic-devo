@@ -88,7 +88,7 @@ stages:
         steps:
           - script: |
               # Run the Ansible playbook
-              ansible-playbook -i $(Pipeline.Workspace)/ansible_project/inventory.yml $(Pipeline.Workspace)/ansible_project/production/Dockerfile
+              ansible-playbook -i $(Pipeline.Workspace)/ansible_project/inventory.yml $(Pipeline.Workspace)/ansible_project/deployment_petclinic.yml
 
 
   - stage: run_selenium_test
@@ -118,7 +118,7 @@ stages:
         pool: Petclinic
         steps: 
          - script: |
-            ansible-playbook -i $(Pipeline.Workspace)/ansible_project/inventory.yml $(Pipeline.Workspace)/ansible_project/acceptance/Dockerfile
+            ansible-playbook -i $(Pipeline.Workspace)/ansible_project/inventory.yml $(Pipeline.Workspace)/ansible_project/deployment_petclinic.yml
 
 
 schedules:

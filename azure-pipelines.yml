@@ -111,7 +111,7 @@ stages:
 
   - stage: deploy_acceptation
     displayName: 'Deploy to Acceptation Environment'
-    dependsOn: run_selenium_tests
+    dependsOn: run_selenium_test
     condition: eq(variables['Agent.JobStatus'], 'Succeeded')
     jobs:
       - job: deploy_to_acceptation

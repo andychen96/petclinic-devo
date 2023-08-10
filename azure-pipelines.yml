@@ -34,7 +34,7 @@ stages:
         pool: Petclinic
         steps:
           - script: |
-              ansible-playbook –i /home/andychen/ansible_project/inventory petclinic_app_test.yml 
+              ansible-playbook petclinic_app_test.yml 
   
 
   - stage: package

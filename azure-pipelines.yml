@@ -12,7 +12,8 @@ stages:
     jobs:
       - job: build
         displayName: 'Build Job'
-        pool: Petclinic
+        pool:
+          name: Petclinic
         steps:
           - script: |
               mvn clean compile
@@ -22,7 +23,8 @@ stages:
     jobs:
       - job: test
         displayName: 'Test Job'
-        pool: Petclinic
+        pool:
+          name: Petclinic
         steps:
           - script: mvn test
 
@@ -31,18 +33,19 @@ stages:
     jobs:
       - job: ansible_deploy_test
         displayName: 'Ansible Deploy Test Job'
-        pool: Petclinic
+        pool:
+          name: Petclinic
         steps:
           - script: |
               ansible-playbook -i /home/andychen/ansible_project/inventory/test /home/andychen/ansible_project/playbook/petclinic_app_test.yml
   
-
   - stage: package
     displayName: 'Package'
     jobs:
       - job: package
         displayName: 'Package Job'
-        pool: Petclinic
+        pool:
+          name: Petclinic
         steps:
           - script: mvn package
 
@@ -51,30 +54,25 @@ stages:
     jobs:
       - job: deploy
         displayName: 'Deploy to Tomcat Job'
-        pool: Petclinic
+        pool:
+          name: Petclinic
         steps:
           - script: mvn tomcat7:deploy
-
 
   - stage: load_test
     displayName: 'Load Test'
     jobs:
       - job: load_test
         displayName: 'JMeter Load Test Job'
-        pool: Petclinic
+        pool:
+          name: Petclinic
         steps:
-
           - task: CmdLine@2
             displayName: 'Run JMeter Locally'
             inputs:
               script: |
-                # Remove old jmeter_report before running
                 rm -rf $(Pipeline.Workspace)/jmeter_report
                 rm -rf $(Pipeline.Workspace)/results.jtl
-
-                displayName: 'Clean Up Old JMeter Reports'
-                
-                # Run the JMeter load test using the locally installed JMeter
                 jmeter -Jmeter.save.saveservice.output_format=xml -n -t $(Pipeline.Workspace)/load-test-repo/load-test.jmx -l $(Pipeline.Workspace)/results.jtl -e -o $(Pipeline.Workspace)/jmeter_report
 
   - stage: ansible_deploy_load
@@ -82,18 +80,19 @@ stages:
     jobs:
       - job: ansible_deploy_load
         displayName: 'Ansible Deploy Load Job'
-        pool: Petclinic
+        pool:
+          name: Petclinic
         steps:
           - script: |
               ansible-playbook -i /home/andychen/ansible_project/inventory/test /home/andychen/ansible_project/playbook/petclinic_app_production.yml
-
 
   - stage: run_selenium_test
     displayName: 'Run Selenium Test'
     jobs:
       - job: run_selenium_test
         displayName: 'Run Selenium Test Job'
-        pool: Petclinic 
+        pool:
+          name: Petclinic 
         steps:
           - script: |
               python /home/andychen/devoteam-traineeship-petclinic/selenium-test.py
@@ -110,31 +109,46 @@ stages:
     jobs:
       - job: ansible_deploy_selenium
         displayName: 'Ansible Deploy Selenium Job'
-        pool: Petclinic
+        pool:
+          name: Petclinic
         steps:
           - script: |
               ansible-playbook -i /home/andychen/ansible_project/inventory/test /home/andychen/ansible_project/playbook/petclinic_app_acceptance.yml
-     
+
+  - stage: TerraformProvision
+    displayName: 'Terraform Provisioning'
+    jobs:
+      - job: TerraformJob
+        displayName: 'Run Terraform'
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+          - script: |
+              terraform init
+              terraform plan
+              terraform apply -auto-approve
+            displayName: 'Terraform Apply'
+          - script: |
+              echo "VM_IP=$(terraform output vm_ip)" >> $GITHUB_ENV
+            displayName: 'Extract VM IP'
 
   - stage: Deploy_to_Production
     displayName: Deploy to production Environment
-    dependsOn: Provisioning
+    dependsOn: TerraformProvision
     jobs:
-    - job: deploy_to_production
-      displayName: Deploy to production Environment
-    pool:
-      name: Petclinic
-      steps:
-      - script: |
-          pip install --user jmespath
-      - script: |
-          scp -r -i /home/andychen/terraform/private_key.pem -r /home/andychen/ansible_project andychen@$(cat /home/andychen/ansible_project/azure_vm/output.json | jq -r '.vm_public_ip.value'):/home/andychen/
-        displayName: 'Copy Ansible playbook to VM'
-      - script: |
-          ansible-playbook -i /home/andychen/ansible_project/inventory/test --private-key=~/.ssh/id_rsa /home/andychen/ansible_project/playbook/production.yml -u andychen
-        displayName: 'Run Ansible playbook'
-
-
+      - job: deploy_to_production
+        displayName: Deploy to production Environment
+        pool:
+          name: Petclinic
+        steps:
+          - script: |
+              pip install --user jmespath
+          - script: |
+              scp -r -i /home/andychen/terraform/private_key.pem -r /home/andychen/ansible_project andychen@$(cat /home/andychen/ansible_project/azure_vm/output.json | jq -r '.vm_public_ip.value'):/home/andychen/
+            displayName: 'Copy Ansible playbook to VM'
+          - script: |
+              ansible-playbook -i /home/andychen/ansible_project/inventory/test --private-key=~/.ssh/id_rsa /home/andychen/ansible_project/playbook/production.yml -u andychen
+            displayName: 'Run Ansible playbook'
 
 schedules:
 - cron: "0 0 * * *"   

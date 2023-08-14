@@ -147,7 +147,7 @@ stages:
               cd /home/andychen/terraform/
               VM_IP=$(terraform output -no-color vm_public_ip | tr -d '"')
               echo "VM IP is: $VM_IP"
-              ssh -v -i /home/andychen/terraform/private_key.pem andychen@$VM_IP "ansible-playbook -i ~/.ansible/ansible_project/inventory/test ~/.ansible/ansible_project/playbook/petclinic_app_production.yml"
+              ansible-playbook -i ~/.ansible/ansible_project/inventory/test ~/.ansible/ansible_project/playbook/petclinic_app_production.yml -l webapp
             displayName: 'Deploy webapp'
 
 

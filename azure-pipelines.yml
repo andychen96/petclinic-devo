@@ -117,19 +117,25 @@ stages:
   - stage: TerraformProvision
     displayName: 'Terraform Provisioning'
     jobs:
-      - job: TerraformJob
-        displayName: 'Run Terraform'
-        pool:
-          vmImage: 'ubuntu-latest'
-        steps:
-          - script: |
-              terraform init
-              terraform plan
-              terraform apply -auto-approve
-            displayName: 'Terraform Apply'
-          - script: |
-              echo "VM_IP=$(terraform output vm_ip)" >> $GITHUB_ENV
-            displayName: 'Extract VM IP'
+    - job: TerraformJob
+      displayName: 'Run Terraform'
+      pool:
+        vmImage: 'ubuntu-latest'
+      steps:
+        - checkout: self  # checks out files from repo
+
+        - script: |
+            cd /home/andychen/terraform
+            terraform init
+            terraform plan
+            terraform apply -auto-approve
+          displayName: 'Terraform Apply'
+
+        - script: |
+            cd terraform_files
+            echo "##vso[task.setvariable variable=VM_IP;]$(terraform output vm_ip)"
+          displayName: 'Extract VM IP'
+
 
   - stage: Deploy_to_Production
     displayName: Deploy to production Environment

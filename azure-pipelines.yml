@@ -10,81 +10,81 @@ stages:
   - stage: build
     displayName: 'Build'
     jobs:
-      - job: build
-        displayName: 'Build Job'
-        pool:
-          name: Petclinic
-        steps:
-          - script: |
-              mvn clean compile
+    - job: build
+      displayName: 'Build Job'
+      pool:
+        name: Petclinic
+      steps:
+      - script: |
+          mvn clean compile
 
   - stage: test
     displayName: 'Test'
     jobs:
-      - job: test
-        displayName: 'Test Job'
-        pool:
-          name: Petclinic
-        steps:
-          - script: mvn test
+    - job: test
+      displayName: 'Test Job'
+      pool:
+        name: Petclinic
+      steps:
+      - script: mvn test
 
   - stage: ansible_deploy_test
     displayName: 'Ansible Deploy to Test'
     jobs:
-      - job: ansible_deploy_test
-        displayName: 'Ansible Deploy Test Job'
-        pool:
-          name: Petclinic
-        steps:
-          - script: |
-              ansible-playbook -i /home/andychen/ansible_project/inventory/test /home/andychen/ansible_project/playbook/petclinic_app_test.yml
-  
+    - job: ansible_deploy_test
+      displayName: 'Ansible Deploy Test Job'
+      pool:
+        name: Petclinic
+      steps:
+      - script: |
+          ansible-playbook -i /home/andychen/ansible_project/inventory/test /home/andychen/ansible_project/playbook/petclinic_app_test.yml
+
   - stage: package
     displayName: 'Package'
     jobs:
-      - job: package
-        displayName: 'Package Job'
-        pool:
-          name: Petclinic
-        steps:
-          - script: mvn package
+    - job: package
+      displayName: 'Package Job'
+      pool:
+        name: Petclinic
+      steps:
+      - script: mvn package
 
   - stage: deploy_tomcat
     displayName: 'Deploy to Tomcat'
     jobs:
-      - job: deploy
-        displayName: 'Deploy to Tomcat Job'
-        pool:
-          name: Petclinic
-        steps:
-          - script: mvn tomcat7:deploy
+    - job: deploy
+      displayName: 'Deploy to Tomcat Job'
+      pool:
+        name: Petclinic
+      steps:
+      - script: mvn tomcat7:deploy
 
   - stage: load_test
     displayName: 'Load Test'
     jobs:
-      - job: load_test
-        displayName: 'JMeter Load Test Job'
-        pool:
-          name: Petclinic
-        steps:
-          - task: CmdLine@2
-            displayName: 'Run JMeter Locally'
-            inputs:
-              script: |
-                rm -rf $(Pipeline.Workspace)/jmeter_report
-                rm -rf $(Pipeline.Workspace)/results.jtl
-                jmeter -Jmeter.save.saveservice.output_format=xml -n -t $(Pipeline.Workspace)/load-test-repo/load-test.jmx -l $(Pipeline.Workspace)/results.jtl -e -o $(Pipeline.Workspace)/jmeter_report
+    - job: load_test
+      displayName: 'JMeter Load Test Job'
+      pool:
+        name: Petclinic
+      steps:
+      - task: CmdLine@2
+        displayName: 'Run JMeter Locally'
+        inputs:
+          script: |
+            rm -rf $(Pipeline.Workspace)/jmeter_report
+            rm -rf $(Pipeline.Workspace)/results.jtl
+            jmeter -Jmeter.save.saveservice.output_format=xml -n -t $(Pipeline.Workspace)/load-test-repo/load-test.jmx -l $(Pipeline.Workspace)/results.jtl -e -o $(Pipeline.Workspace)/jmeter_report
 
   - stage: ansible_deploy_load
     displayName: 'Ansible Deploy to Load'
     jobs:
-      - job: ansible_deploy_load
-        displayName: 'Ansible Deploy Load Job'
-        pool:
-          name: Petclinic
-        steps:
-          - script: |
-              ansible-playbook -i /home/andychen/ansible_project/inventory/test /home/andychen/ansible_project/playbook/petclinic_app_production.yml
+    - job: ansible_deploy_load
+      displayName: 'Ansible Deploy Load Job'
+      pool:
+        name: Petclinic
+      steps:
+      - script: |
+          ansible-playbook -i /home/andychen/ansible_project/inventory/test /home/andychen/ansible_project/playbook/petclinic_app_production.yml
 
   - stage: run_selenium_test
     displayName: 'Run Selenium Test'
@@ -94,25 +94,24 @@ stages:
       pool:
         name: Petclinic 
       steps:
-        - script: |
-            python /home/andychen/devoteam-traineeship-petclinic/selenium-test.py
-        - task: PublishTestResults@2
-          displayName: 'Publish Selenium Test Results'
-          inputs:
-            testResultsFiles: 'report.html'
-            testRunTitle: 'Selenium Test Results'
-
+      - script: |
+          python /home/andychen/devoteam-traineeship-petclinic/selenium-test.py
+      - task: PublishTestResults@2
+        displayName: 'Publish Selenium Test Results'
+        inputs:
+          testResultsFiles: 'report.html'
+          testRunTitle: 'Selenium Test Results'
 
   - stage: ansible_deploy_selenium
     displayName: 'Ansible Deploy to Selenium'
     jobs:
-      - job: ansible_deploy_selenium
-        displayName: 'Ansible Deploy Selenium Job'
-        pool:
-          name: Petclinic
-        steps:
-          - script: |
-              ansible-playbook -i /home/andychen/ansible_project/inventory/test /home/andychen/ansible_project/playbook/petclinic_app_acceptance.yml
+    - job: ansible_deploy_selenium
+      displayName: 'Ansible Deploy Selenium Job'
+      pool:
+        name: Petclinic
+      steps:
+      - script: |
+          ansible-playbook -i /home/andychen/ansible_project/inventory/test /home/andychen/ansible_project/playbook/petclinic_app_acceptance.yml
 
   - stage: TerraformProvision
     displayName: 'Terraform Provisioning'
@@ -122,36 +121,34 @@ stages:
       pool:
         name: Petclinic
       steps:
-        - checkout: self  # checks out files from repo
-
-        - script: |
-            cd /home/andychen/terraform/
-            terraform init
-            terraform plan
-            terraform apply -auto-approve
-          displayName: 'Terraform Apply'
+      - checkout: self  
+      - script: |
+          cd /home/andychen/terraform/
+          terraform init
+          terraform plan
+          terraform apply -auto-approve
+        displayName: 'Terraform Apply'
 
   - stage: DeployWebapp
     displayName: 'Deploy Webapp using Ansible'
     jobs:
     - job: DeployJob
       displayName: 'Deploy Webapp'
-    pool:
-      name: Petclinic 
-     steps:
-     - script: |
-        VM_IP=$(terraform output vm_public_ip)
-        scp -r -i /path_to_key/private_key.pem /home/andychen/ansible_project/playbook/ andychen@$VM_IP:/home/andychen/
-      displayName: 'Copy Ansible Playbook to VM'
-      
-    - script: |
-        ssh -i /home/andychen/terraform/private_key.pem andychen@$VM_IP "cd /home/andychen/ansible_project/playbook/petclinic_app_production.yml"
-      displayName: 'Run Ansible Playbook'
-
+      pool:
+        name: Petclinic 
+      steps:
+      - script: |
+          VM_IP=$(terraform output vm_public_ip)
+          scp -r -i /path_to_key/private_key.pem /home/andychen/ansible_project/playbook/ andychen@$VM_IP:/home/andychen/
+        displayName: 'Copy Ansible Playbook to VM'
+        
+      - script: |
+          ssh -i /home/andychen/terraform/private_key.pem andychen@$VM_IP "ansible-playbook /home/andychen/ansible_project/playbook/petclinic_app_production.yml"
+        displayName: 'Run Ansible Playbook'
 
 schedules:
 - cron: "0 0 * * *"   
   displayName: DailySchedule
   branches:
     include:
-      - master
+      - master     

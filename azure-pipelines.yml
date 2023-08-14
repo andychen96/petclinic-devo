@@ -148,7 +148,7 @@ stages:
         
       - script: |
           ssh -i /home/andychen/terraform/private_key.pem andychen@$VM_IP 
-          ansible-playbook -i /home/andychen/ansible/inventory/test --private-key=~/.ssh/id_rsa  /home/andychen/ansible/playbook/petclinic_app_production.yml -u andychen
+          ansible-playbook -i ~/.ansible/inventory/test ~/.ansible/playbook/petclinic_app_production.yml
         displayName: 'Run Ansible Playbook'
 
 schedules:

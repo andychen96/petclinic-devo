@@ -147,8 +147,7 @@ stages:
         displayName: 'Copy Ansible Playbook to VM'
         
       - script: |
-          ssh -i /home/andychen/terraform/private_key.pem andychen@$VM_IP 
-          ansible-playbook -i ~/.ansible/inventory/test ~/.ansible/playbook/petclinic_app_production.yml
+          ssh -i /home/andychen/terraform/private_key.pem andychen@$VM_IP "ansible-playbook -i ~/.ansible/inventory/test ~/.ansible/playbook/petclinic_app_production.yml"
         displayName: 'Run Ansible Playbook'
 
 schedules:

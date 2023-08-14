@@ -145,7 +145,7 @@ stages:
           - script: |
               pip install --user jmespath
           - script: |
-              scp -r -i /home/andychen/terraform/private_key.pem -r /home/andychen/ansible_project andychen@$(cat /home/andychen/ansible_project/azure_vm/output.json | jq -r '.vm_public_ip.value'):/home/andychen/
+              scp -r -i /home/andychen/terraform/private_key.pem /home/andychen/ansible_project andychen@$(cat /home/andychen/ansible_project/azure_vm/output.json | jq -r '.vm_public_ip.value'):/home/andychen/
             displayName: 'Copy Ansible playbook to VM'
           - script: |
               ansible-playbook -i /home/andychen/ansible_project/inventory/test --private-key=~/.ssh/id_rsa /home/andychen/ansible_project/playbook/production.yml -u andychen

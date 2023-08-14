@@ -125,7 +125,7 @@ stages:
         - checkout: self  # checks out files from repo
 
         - script: |
-            cd /home/andychen/terraform
+            cd /home/andychen/terraform/
             terraform init
             terraform plan
             terraform apply -auto-approve

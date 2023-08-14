@@ -144,14 +144,9 @@ stages:
           VM_IP=$(terraform output -no-color vm_public_ip | tr -d '"')
           echo "VM IP is: $VM_IP"
           scp -i ~/.ssh/id_rsa -r /home/andychen/terraform/private_key.pem /home/andychen/ansible_project andychen@$VM_IP:~/.ansible
+          ssh -i /home/andychen/terraform/private_key.pem andychen@$VM_IP "ansible-playbook -i ~/.ansible/inventory/test ~/.ansible/playbook/petclinic_app_production.yml"
         displayName: 'Copy Ansible Playbook to VM'
         
-      - script: |
-          cd /home/andychen/terraform/
-          VM_IP=$(terraform output -no-color vm_public_ip | tr -d '"')
-          echo "VM IP is: $VM_IP"
-          ssh -i /home/andychen/terraform/private_key.pem andychen@$VM_IP "ansible-playbook -i ~/.ansible/inventory/test ~/.ansible/playbook/petclinic_app_production.yml"
-        displayName: 'Run Ansible Playbook'
 
 schedules:
 - cron: "0 0 * * *"   

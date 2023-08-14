@@ -138,8 +138,8 @@ stages:
         name: Petclinic 
       steps:
       - script: |
-          VM_IP=$(terraform output vm_public_ip)
-          scp -r -i /path_to_key/private_key.pem /home/andychen/ansible_project/playbook/ andychen@$VM_IP:/home/andychen/
+          VM_IP=$(terraform output -no-color vm_public_ip)
+          scp -r -i /home/andychen/terraform/private_key.pem /home/andychen/ansible_project/playbook/ andychen@$VM_IP:/home/andychen/
         displayName: 'Copy Ansible Playbook to VM'
         
       - script: |

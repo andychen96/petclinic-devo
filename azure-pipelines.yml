@@ -143,7 +143,7 @@ stages:
           cd /home/andychen/terraform/
           VM_IP=$(terraform output -no-color vm_public_ip | tr -d '"')
           echo "VM IP is: $VM_IP"
-          scp -r -i /home/andychen/terraform/private_key.pem /home/andychen/ansible_project andychen@104.45.38.116:~/.ansible
+          scp -i ~/.ssh/id_rsa -r /home/andychen/terraform/private_key.pem /home/andychen/ansible_project andychen@VM_IP:~/.ansible
         displayName: 'Copy Ansible Playbook to VM'
         
       - script: |

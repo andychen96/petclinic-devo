@@ -131,25 +131,23 @@ stages:
             terraform apply -auto-approve
           displayName: 'Terraform Apply'
 
-
-
-  - stage: Deploy_to_Production
-    displayName: Deploy to production Environment
-    dependsOn: TerraformProvision
+  - stage: DeployWebapp
+    displayName: 'Deploy Webapp using Ansible'
     jobs:
-      - job: deploy_to_production
-        displayName: Deploy to production Environment
-        pool:
-          name: Petclinic
-        steps:
-          - script: |
-              pip install --user jmespath
-          - script: |
-              scp -r -i /home/andychen/terraform/private_key.pem /home/andychen/ansible_project andychen@$(cat /home/andychen/ansible_project/azure_vm/output.json | jq -r '.vm_public_ip.value'):/home/andychen/
-            displayName: 'Copy Ansible playbook to VM'
-          - script: |
-              ansible-playbook -i /home/andychen/ansible_project/inventory/test --private-key=~/.ssh/id_rsa /home/andychen/ansible_project/playbook/production.yml -u andychen
-            displayName: 'Run Ansible playbook'
+    - job: DeployJob
+      displayName: 'Deploy Webapp'
+    pool:
+      name: Petclinic 
+     steps:
+     - script: |
+        VM_IP=$(terraform output vm_public_ip)
+        scp -r -i /path_to_key/private_key.pem /home/andychen/ansible_project/playbook/ andychen@$VM_IP:/home/andychen/
+      displayName: 'Copy Ansible Playbook to VM'
+      
+    - script: |
+        ssh -i /home/andychen/terraform/private_key.pem andychen@$VM_IP "cd /home/andychen/ansible_project/playbook/petclinic_app_production.yml"
+      displayName: 'Run Ansible Playbook'
+
 
 schedules:
 - cron: "0 0 * * *"   

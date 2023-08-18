@@ -109,9 +109,8 @@ stages:
         steps:
           - script: |
               cd /home/andychen/terraform/
-              VM_IPS="4.180.204.47,4.180.204.38,4.180.204.20,"
-              echo "VM IPS is: $VM_IPS"
-              ansible-playbook -i "$VM_IPS" /home/andychen/ansible_project/playbook/petclinic_app_combined.yml 
+              ansible-playbook -i /path/to/inventory/file -l targets /path/to/playbook.yml
+
             displayName: 'Deploy webapp'
 
 

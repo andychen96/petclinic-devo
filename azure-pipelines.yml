@@ -109,10 +109,11 @@ stages:
         steps:
           - script: |
               cd /home/andychen/terraform/
-              VM_IPS=$(terraform output -no-color vm_public_ips | tr -d '[]" ' | tr '\n' ',')
+              VM_IPS="4.180.204.20,4.180.204.38,4.180.204.47,"
               echo "VM IPS is: $VM_IPS"
-              ansible-playbook -i "$VM_IPS," /home/andychen/ansible_project/playbook/petclinic_app_combined.yml 
+              ansible-playbook -i "$VM_IPS" /home/andychen/ansible_project/playbook/petclinic_app_combined.yml 
             displayName: 'Deploy webapp'
+
 
 
   - stage: load_test_production_environment

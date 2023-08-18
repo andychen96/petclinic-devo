@@ -109,7 +109,7 @@ stages:
         steps:
           - script: |
               cd /home/andychen/terraform/
-              ansible-playbook -i /path/to/inventory/file -l targets /path/to/playbook.yml
+              ansible-playbook -i /home/andychen/ansible_project/inventory/test -l targets/home/andychen/ansible_project/playbook/petclinic_app_combined.yml 
 
             displayName: 'Deploy webapp'
 

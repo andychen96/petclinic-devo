@@ -108,28 +108,11 @@ stages:
           name: Petclinic
         steps:
           - script: |
-              eval "$(ssh-agent -s)"
-              ssh-add /home/andychen/terraform/private_key.pem
-              
               cd /home/andychen/terraform/ 
               VM_IPS=(4.180.204.20 4.180.204.38 4.180.204.47)
 
-              for IP in "${VM_IPS[@]}"; do
-                ssh-copy-id -i /home/andychen/.ssh/id_rsa.pub andychen@$IP
-              done
-
-              for IP in "${VM_IPS[@]}"; do
-                scp -v -i /home/andychen/terraform/private_key.pem /home/andychen/.ssh/id_rsa.pub andychen@$IP:~/.ssh/authorized_keys
-                if [ $? -ne 0 ]; then
-                  echo "Failed to copy to $IP"
-                else
-                  echo "Successfully copied to $IP"
-                fi
-              done
             displayName: 'Run Ansible Playbook'
           - script: |
-              eval "$(ssh-agent -s)"
-              ssh-add /home/andychen/terraform/private_key.pem
               cd /home/andychen/terraform/
               VM_IPS=$(terraform output -no-color vm_public_ips | tr -d '"')
               echo "VM IPS is: $VM_IPS"

@@ -27,15 +27,6 @@ stages:
         steps:
           - script: mvn test
 
-  - stage: ansible_deploy_test
-    displayName: 'Ansible Deploy to Test'
-    jobs:
-      - job: ansible_deploy_test
-        displayName: 'Ansible Deploy Test Job'
-        pool:
-          name: Petclinic
-        steps:
-          - script: ansible-playbook -i /home/andychen/ansible_project/inventory/test /home/andychen/ansible_project/playbook/petclinic_app_test.yml
 
   - stage: package
     displayName: 'Package'
@@ -73,15 +64,6 @@ stages:
                 rm -rf $(Pipeline.Workspace)/results.jtl
                 jmeter -Jmeter.save.saveservice.output_format=xml -n -t $(Pipeline.Workspace)/load-test-repo/load-test.jmx -l $(Pipeline.Workspace)/results.jtl -e -o $(Pipeline.Workspace)/jmeter_report
 
-  - stage: ansible_deploy_load
-    displayName: 'Ansible Deploy to Load'
-    jobs:
-      - job: ansible_deploy_load
-        displayName: 'Ansible Deploy Load Job'
-        pool:
-          name: Petclinic
-        steps:
-          - script: ansible-playbook -i /home/andychen/ansible_project/inventory/test /home/andychen/ansible_project/playbook/petclinic_app_production.yml
 
   - stage: run_selenium_test
     displayName: 'Run Selenium Test'
@@ -98,15 +80,6 @@ stages:
               testResultsFiles: 'report.html'
               testRunTitle: 'Selenium Test Results'
 
-  - stage: ansible_deploy_selenium
-    displayName: 'Ansible Deploy to Selenium'
-    jobs:
-      - job: ansible_deploy_selenium
-        displayName: 'Ansible Deploy Selenium Job'
-        pool:
-          name: Petclinic
-        steps:
-          - script: ansible-playbook -i /home/andychen/ansible_project/inventory/test /home/andychen/ansible_project/playbook/petclinic_app_acceptance.yml
 
   - stage: TerraformProvision
     displayName: 'Terraform Provisioning'
@@ -138,7 +111,7 @@ stages:
               cd /home/andychen/terraform/ 
               VM_IP=$(terraform output -no-color vm_public_ip | tr -d '"') #retrieve and process value of VM_IP and remove ""
               echo "VM IP is: $VM_IP" #for debugging purpose
-              scp -i ~/.ssh/id_rsa -r /home/andychen/terraform/private_key.pem /home/andychen/ansible_project andychen@$VM_IP:~/.ansible #secure copy private key and authenticate transfer. 
+              scp -i ~/.ssh/id_rsa -r /home/andychen/terraform/private_key.pem andychen@$VM_IP:~/.ssh #secure copy private key and authenticate transfer. 
             displayName: 'Copy Ansible Playbook to VM'
 
           - script: |
@@ -147,8 +120,24 @@ stages:
               cd /home/andychen/terraform/
               VM_IP=$(terraform output -no-color vm_public_ip | tr -d '"')
               echo "VM IP is: $VM_IP"
-              ansible-playbook -i /home/andychen/ansible_project/inventory/test /home/andychen/ansible_project/playbook/petclinic_app_production.yml -l webapp #run ansible #run ansible and use inventory file and limit to webapp host group
+              ansible-playbook -i /home/andychen/ansible_project/inventory/test /home/andychen/ansible_project/playbook/petclinic_app_combined.yml 
             displayName: 'Deploy webapp'
+
+  - stage: load_test_production_environment
+    displayName: 'Load Test Production Environment'
+    jobs:
+      - job: load_test_production_environment
+        displayName: 'JMeter Load Test Production Job'
+        pool:
+          name: Petclinic
+        steps:
+          - task: CmdLine@2
+            displayName: 'Run JMeter on VM'
+            inputs:
+              script: |
+                rm -rf $(Pipeline.Workspace)/jmeter_report
+                rm -rf $(Pipeline.Workspace)/results.jtl
+                jmeter -Jmeter.save.saveservice.output_format=xml -n -t $(Pipeline.Workspace)/load-test-repo/VM_load_test.jmx -l $(Pipeline.Workspace)/results.jtl -e -o $(Pipeline.Workspace)/jmeter_report
 
 
 schedules:

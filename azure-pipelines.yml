@@ -98,7 +98,7 @@ stages:
               terraform plan
               terraform apply -auto-approve
             displayName: 'Terraform Apply'
-
+            
   - stage: DeployWebapp
     displayName: 'Deploy Webapp using Ansible'
     jobs:
@@ -108,16 +108,12 @@ stages:
           name: Petclinic
         steps:
           - script: |
-              cd /home/andychen/terraform/ 
-              VM_IPS=(4.180.204.20 4.180.204.38 4.180.204.47)
-
-            displayName: 'Run Ansible Playbook'
-          - script: |
               cd /home/andychen/terraform/
-              VM_IPS=$(terraform output -no-color vm_public_ips | tr -d '"')
+              VM_IPS=$(terraform output -no-color vm_public_ips | tr -d '[]" ' | tr '\n' ',')
               echo "VM IPS is: $VM_IPS"
-              ansible-playbook -i /home/andychen/ansible_project/inventory/test /home/andychen/ansible_project/playbook/petclinic_app_combined.yml 
+              ansible-playbook -i "$VM_IPS," /home/andychen/ansible_project/playbook/petclinic_app_combined.yml 
             displayName: 'Deploy webapp'
+
 
   - stage: load_test_production_environment
     displayName: 'Load Test Production Environment'

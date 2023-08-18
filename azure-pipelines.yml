@@ -131,11 +131,11 @@ stages:
                 rm -rf $(Pipeline.Workspace)/results.jtl
                 jmeter -Jmeter.save.saveservice.output_format=xml -n -t $(Pipeline.Workspace)/load-test-repo/VM_load_test.jmx -l $(Pipeline.Workspace)/results.jtl -e -o $(Pipeline.Workspace)/jmeter_report
 
-  - stage: run_selenium_test
-    displayName: 'Run Selenium Test'
+  - stage: run_selenium_vm
+    displayName: 'Run Selenium VM'
     jobs:
-      - job: run_selenium_test
-        displayName: 'Run Selenium Test Job'
+      - job: run_selenium_VM
+        displayName: 'Run Selenium VM'
         pool:
           name: Petclinic
         steps:

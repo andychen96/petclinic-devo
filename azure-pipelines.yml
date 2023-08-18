@@ -124,6 +124,7 @@ stages:
             displayName: 'Run Ansible Playbook'
           - script: |
               eval "$(ssh-agent -s)"
+              ssh -v andychen@<IP> 
               ssh-add /home/andychen/terraform/private_key.pem
               cd /home/andychen/terraform/
               VM_IP=$(terraform output -no-color vm_public_ips | tr -d '"')

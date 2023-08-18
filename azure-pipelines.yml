@@ -119,7 +119,7 @@ stages:
               done
 
               for IP in "${VM_IPS[@]}"; do
-                scp -i /home/andychen/terraform/private_key.pem /home/andychen/.ssh/id_rsa.pub andychen@$IP:~/.ssh/authorized_keys
+                scp -v -i /home/andychen/terraform/private_key.pem /home/andychen/.ssh/id_rsa.pub andychen@$IP:~/.ssh/authorized_keys
                 if [ $? -ne 0 ]; then
                   echo "Failed to copy to $IP"
                 else
@@ -129,7 +129,6 @@ stages:
             displayName: 'Run Ansible Playbook'
           - script: |
               eval "$(ssh-agent -s)"
-              ssh -v andychen@<IP> 
               ssh-add /home/andychen/terraform/private_key.pem
               cd /home/andychen/terraform/
               VM_IPS=$(terraform output -no-color vm_public_ips | tr -d '"')

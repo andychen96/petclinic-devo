@@ -16,6 +16,7 @@ stages:
           name: Petclinic
         steps:
           - script: mvn clean compile
+            displayName: 'Maven Clean Compile'
 
   - stage: test
     displayName: 'Test'
@@ -26,7 +27,7 @@ stages:
           name: Petclinic
         steps:
           - script: mvn test
-
+            displayName: 'Maven Test'
 
   - stage: package
     displayName: 'Package'
@@ -37,6 +38,7 @@ stages:
           name: Petclinic
         steps:
           - script: mvn package
+            displayName: 'Maven Package'
 
   - stage: deploy_tomcat
     displayName: 'Deploy to Tomcat'
@@ -47,6 +49,7 @@ stages:
           name: Petclinic
         steps:
           - script: mvn tomcat7:deploy
+            displayName: 'Maven Deploy to Tomcat'
 
   - stage: load_test
     displayName: 'Load Test'
@@ -64,22 +67,21 @@ stages:
                 rm -rf $(Pipeline.Workspace)/results.jtl
                 jmeter -Jmeter.save.saveservice.output_format=xml -n -t $(Pipeline.Workspace)/load-test-repo/load-test.jmx -l $(Pipeline.Workspace)/results.jtl -e -o $(Pipeline.Workspace)/jmeter_report
 
-
   - stage: run_selenium_test
     displayName: 'Run Selenium Test'
     jobs:
       - job: run_selenium_test
         displayName: 'Run Selenium Test Job'
         pool:
-          name: Petclinic 
+          name: Petclinic
         steps:
           - script: python /home/andychen/devoteam-traineeship-petclinic/selenium-test.py
+            displayName: 'Run Selenium Test'
           - task: PublishTestResults@2
             displayName: 'Publish Selenium Test Results'
             inputs:
               testResultsFiles: 'report.html'
               testRunTitle: 'Selenium Test Results'
-
 
   - stage: TerraformProvision
     displayName: 'Terraform Provisioning'
@@ -89,7 +91,7 @@ stages:
         pool:
           name: Petclinic
         steps:
-          - checkout: self  
+          - checkout: self
           - script: |
               cd /home/andychen/terraform/
               terraform init
@@ -106,14 +108,20 @@ stages:
           name: Petclinic
         steps:
           - script: |
-              eval "$(ssh-agent -s)" #start ssh agent in background and export environment variables to current shell
-              ssh-add /home/andychen/terraform/private_key.pem #add private key to ssh agent
+              eval "$(ssh-agent -s)"
+              ssh-add /home/andychen/terraform/private_key.pem
               cd /home/andychen/terraform/ 
-              VM_IP=$(terraform output -no-color vm_public_ips | tr -d '"') #retrieve and process value of VM_IP and remove ""
-              echo "VM IP is: $VM_IP" #for debugging purpose
-              scp -i ~/.ssh/id_rsa /home/andychen/terraform/private_key.pem andychen@$VM_IP:~/.ssh #secure copy private key and authenticate transfer. 
-            displayName: 'Copy Ansible Playbook to VM'
+              VM_IPS=(4.180.204.20 4.180.204.38 4.180.204.47)
 
+              for IP in "${VM_IPS[@]}"; do
+                scp -i /home/andychen/terraform/private_key.pem /home/andychen/ansible_project andychen@$IP:~/.ssh
+                if [ $? -ne 0 ]; then
+                  echo "Failed to copy to $IP"
+                else
+                  echo "Successfully copied to $IP"
+                fi
+              done
+            displayName: 'Run Ansible Playbook'
           - script: |
               eval "$(ssh-agent -s)"
               ssh-add /home/andychen/terraform/private_key.pem
@@ -138,7 +146,6 @@ stages:
                 rm -rf $(Pipeline.Workspace)/jmeter_report
                 rm -rf $(Pipeline.Workspace)/results.jtl
                 jmeter -Jmeter.save.saveservice.output_format=xml -n -t $(Pipeline.Workspace)/load-test-repo/VM_load_test.jmx -l $(Pipeline.Workspace)/results.jtl -e -o $(Pipeline.Workspace)/jmeter_report
-
 
 schedules:
   - cron: "0 0 * * *"   

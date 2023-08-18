@@ -113,10 +113,13 @@ stages:
               
               cd /home/andychen/terraform/ 
               VM_IPS=(4.180.204.20 4.180.204.38 4.180.204.47)
-              ssh-copy-id -i /home/andychen/.ssh/id_rsa.pub azureuser@IP
 
               for IP in "${VM_IPS[@]}"; do
-                scp -i /home/andychen/terraform/private_key.pem andychen@$IP:~/.ssh
+                ssh-copy-id -i /home/andychen/.ssh/id_rsa.pub andychen@$IP
+              done
+
+              for IP in "${VM_IPS[@]}"; do
+                scp -i /home/andychen/terraform/private_key.pem /home/andychen/.ssh/id_rsa.pub andychen@$IP:~/.ssh/authorized_keys
                 if [ $? -ne 0 ]; then
                   echo "Failed to copy to $IP"
                 else
@@ -130,7 +133,7 @@ stages:
               ssh-add /home/andychen/terraform/private_key.pem
               cd /home/andychen/terraform/
               VM_IPS=$(terraform output -no-color vm_public_ips | tr -d '"')
-              echo "VM IP is: $VM_IP"
+              echo "VM IPS is: $VM_IPS"
               ansible-playbook -i /home/andychen/ansible_project/inventory/test /home/andychen/ansible_project/playbook/petclinic_app_combined.yml 
             displayName: 'Deploy webapp'
 

@@ -121,8 +121,8 @@ stages:
       name: Petclinic
     steps:
     - script: |
+        whoami
         cd /home/andychen/terraform/
-         - script: chmod 600 /home/andychen/terraform/private_key.pem
         ansible-playbook -i /home/andychen/ansible_project/inventory/test -l targets /home/andychen/ansible_project/playbook/petclinic_app_combined.yml
       displayName: 'Deploy webapp'
 
